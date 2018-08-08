@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>postMsg_A</title>
+</head>
+
+<body>
+  <h1>postMsg_A</h1>
+  <button onclick="openPageB()">打开B页面</button>
+  <script>
+    const pageBUrl = 'http://127.0.0.1:4000';  // 希望发送消息的网址
+    const pageCUrl = 'http://127.0.0.1:4200'; // 其他不希望发送消息的网址
+    var popup = window.open(pageBUrl); // 保持对B窗口的引用
+
+    function openPageB() {
+      console.log(popup);
+      // 如果弹出框没有被阻止且加载完成
+      // 这行语句没有发送信息出去，即使假设当前页面没有改变location（因为targetOrigin设置不对,）
+      // popup.postMessage("The user is 'bob' and the password is 'secret'", pageCUrl);
+
+      // 假设当前页面没有改变location，这条语句会成功添加message到发送队列中去（targetOrigin设置对了）
+      popup.postMessage("我是发送到B页面的消息，yeah!", pageBUrl);
+    }
+    
+
+    // 以下是为 当前页面 绑定对B页面的监听，如果B页面发送消息过来，则触发。
+    function receiveMessage(event) {
+      alert('收到B页面发来的信息，查看console窗口')
+      console.log(event);
+      // 我们能相信信息的发送者吗?  (也许这个发送者和我们最初打开的不是同一个页面).
+      if (event.origin !== pageBUrl){
+        return;
+      }
+      console.log('收到B页面发来的信息：', event.data);
+      
+      // event.source 是我们通过window.open打开的弹出页面 popup
+    }
+    window.addEventListener("message", receiveMessage, false);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>postMsg_B</title>
+</head>
+
+<body>
+  <h1>postMsg_B</h1>
+  <button onclick="sendMsgToA()">发送消息到A页面</button>
+  <script>
+    const pageAUrl = 'http://127.0.0.1:8080';
+    var page_A_source = null; // 可以预先设定为固定值，也可以是收到消息之后设置(如下)
+    
+    function sendMsgToA(){
+      if(page_A_source){
+        page_A_source.postMessage("hi there yourself!  the secret response is: rheeeeet!", pageAUrl);
+      }else{
+        alert('没有可发送消息的窗口')
+      }
+    }
+
+    //当A页面postMessage被调用后，这个function被addEventListenner调用
+    function receiveMessage(event) {
+      // 我们能信任信息来源吗？pageAUrl必须指定父窗口地址
+      alert('收到A页面发来的信息，查看console窗口')
+      console.log('收到A页面发来的信息：', event);
+      if (event.origin !== pageAUrl){
+        return;
+      }
+      page_A_source = event.source; // 保持A窗口的引用
+    }
+
+    window.addEventListener("message", receiveMessage, false);
+  </script>
+</body>
+
+</html>
